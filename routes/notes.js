@@ -68,4 +68,23 @@ router.put('/editnote/:id', FetchUser, async (req, res) => {
     }
 })
 
+//ROUTE 4: Delete a note using: DELETE "/api/notes/deletenote/:id". Login required
+router.delete('/deletenote/:id', FetchUser, async (req, res) => {
+    try {
+        let note = await Note.findById(req.params.id);
+        if (!note) { return res.status(404).send("Not Found") }
+
+        //Check if user logged in is accessing the note or not. only allow logged in user to delete
+        if (note.user.toString() !== req.user.id) {
+            return res.status(401).send("Not Allowed")
+        }
+
+        note = await Note.findByIdAndDelete(req.params.id)
+        res.json({ "Success": "Note has been deleted successfully", note: note })
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+})
+
 module.exports = router

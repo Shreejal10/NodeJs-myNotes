@@ -29,4 +29,15 @@ router.post('/addnote', FetchUser, [
     }
 })
 
+//ROUTE 2: Fetch all Notes of a user using: GET "/api/notes/fetchnotes". Login required
+router.get('/fetchnotes', FetchUser, async (req, res) => {
+    try {
+        const notes = await Note.find({ user: req.user.id });
+        res.json(notes)
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+})
+
 module.exports = router

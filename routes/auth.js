@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User')
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
+require('dotenv/config')
+const JWT_SECRET = process.env.JWT_SECRET
 
 //ROUTE 1: Create a new user using: POST "/api/auth/createuser". 
 router.post('/createuser', [
@@ -24,14 +28,31 @@ router.post('/createuser', [
             return res.status(400).json({ error: "Sorry a user with this email already exixts" })
         }
 
+        //Create Salt to add with password for security
+        const salt = await bcrypt.genSalt(10);
+        const securePassword = await bcrypt.hash(req.body.password, salt)
+
         //Create a new User
         user = await User.create({
             fname: req.body.fname,
             lname: req.body.lname,
+            name: req.body.fname + " " + req.body.lname,
             email: req.body.email,
-            password: req.body.password,
-        })
-        res.json(user)
+            password: securePassword,
+        });
+
+        //get data using id for authToken
+        const data = {
+            user: {
+                id: user.id
+            }
+        }
+
+        //Create an authToken for the user to login easily
+        const authToken = jwt.sign(data, JWT_SECRET)
+
+        //Response
+        res.json({ authToken })
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");

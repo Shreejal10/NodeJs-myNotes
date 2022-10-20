@@ -40,4 +40,32 @@ router.get('/fetchnotes', FetchUser, async (req, res) => {
     }
 })
 
+//ROUTE 3: Edit a note using: PUT: "/api/notes/editnote/:id". Login required
+router.put('/editnote/:id', FetchUser, async (req, res) => {
+    const { title, description, tag } = req.body;
+    try {
+        //Create a new note object
+        const newNote = {}
+        if (title) { newNote.title = title };
+        if (description) { newNote.description = description };
+        if (tag) { newNote.tag = tag };
+
+        //Find the note to be edited and update it
+        let note = await Note.findById(req.params.id);
+        if (!note) { return res.status(404).send("Not Found") }
+
+        //Check if the user logged in is accessing the data or not
+        if (note.user.toString() !== req.user.id) {
+            return res.status(401).send("Not Allowed")
+        }
+
+        //update note
+        note = await Note.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true })
+        res.json({ note })
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error");
+    }
+})
+
 module.exports = router

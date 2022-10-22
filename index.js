@@ -15,5 +15,5 @@ app.use('/api/auth', require('./routes/auth')) //Route for user: sigUp, logIn, g
 app.use('/api/notes', require('./routes/notes')) //Route for notes: addNote, fetchAllNotes, editNotes, deleteNotes 
 
 app.listen(port, () => {
-    console.log(`myNotes Backend running at  http://localhost:${port}`)
+    console.log(`myNotes Backend running at  https://0.0.0.0:${port}`)
 })

@@ -26,4 +26,8 @@ app.listen(port, () => {
 Then run the server using:
 ```
     npx nodemon ./index.js
+``````
+OR
+```
+    npm run dev
 ```
